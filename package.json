@@ -25,6 +25,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.12.2",
     "bcryptjs": "^2.4.3",
+    "cluster": "^0.7.7",
     "config": "^3.3.9",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
