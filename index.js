@@ -7,6 +7,9 @@ const os = require('os');
 const rootCert = fs.readFileSync('./certs/ca.crt');
 const certChain = fs.readFileSync('./certs/server.crt');
 const privateKey = fs.readFileSync('./certs/server.key');
+const db_status = require('./microservices/mysql-connect');
+const redisDB = require('./microservices/redis-connect').redisClient.ping();
+
 
 const serverCredentials = grpc.ServerCredentials.createSsl(rootCert, [{
   cert_chain: certChain,
