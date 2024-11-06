@@ -16,44 +16,53 @@ const masterConfig = {
   queueLimit: config.get('mysqldb.queueLimit'),
 };
 
-
-mysql.on('enqueue', function () {
-  console.log('Waiting for available connection slot');
-});
-
-mysql.on('release', function (connection) {
-  console.log('Connection %d released', connection.threadId);
-});
-
-mysql.on('acquire', function (connection) {
-  console.log('Connection %d acquired', connection.threadId);
-});
-
-mysql.on('connection', function (connection) {
-  console.log('Connection %d connected', connection.threadId);
-});
-
-mysql.on('error', function (err) {
-  console.log('Connection error: ' + err.stack);
-});
-
-mysql.on('close', function (err) {
-  console.log('Connection closed: ' + err.stack);
-});
-
-
+// Add the master configuration to the pool cluster
 mysql.add('MASTER', masterConfig);
-// connection.add('READ_REPLICA', replica1Config);
 
+// Connection event handlers
+mysql.on('enqueue', () => console.log('Waiting for available connection slot'));
+mysql.on('release', (connection) => console.log('Connection %d released', connection.threadId));
+mysql.on('acquire', (connection) => console.log('Connection %d acquired', connection.threadId));
+mysql.on('connection', (connection) => console.log('Connection %d connected', connection.threadId));
+mysql.on('error', (err) => console.log('Connection error: ' + err.stack));
+mysql.on('close', (err) => console.log('Connection closed: ' + err.stack));
 
-// Check if connection is successful
+// Retrieve connection and run queries
 mysql.getConnection('MASTER', (err, connection) => {
   if (err) {
     console.error('Database connection failed: ' + err.stack);
     return;
   }
-  console.log('MySql Connected.');
+  console.log('MySQL Connected.');
 });
 
-// Export the connection
+// Handle termination signals
+process.on('SIGINT', () => {
+  mysql.end((err) => {
+    if (err) {
+      console.error('Error occurred while closing the connection: ' + err.stack);
+      return;
+    }
+    console.log('MySQL connection closed.');
+  });
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception: ' + err.stack);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled promise rejection: ' + err);
+  process.exit(1);
+});
+
+// Handle wornings
+process.on('warning', (warning) => {
+  console.warn('Warning: ' + warning.name);
+});
+
+// Export the pool cluster
 module.exports = mysql;

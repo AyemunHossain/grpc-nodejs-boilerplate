@@ -6,7 +6,7 @@
   "scripts": {
     "server": "nodemon index.js --inspect",
     "client": "node client/client.js --inspect",
-    "rpc": "node utils/protoc.js"
+    "rpc": "node scripts/protoc.js"
   },
   "repository": {
     "type": "git",

@@ -3,23 +3,23 @@ require('dotenv').config();
 const fs = require('fs');
 const cluster = require('cluster');
 const os = require('os');
-
 const rootCert = fs.readFileSync('./certs/ca.crt');
 const certChain = fs.readFileSync('./certs/server.crt');
 const privateKey = fs.readFileSync('./certs/server.key');
 const db_status = require('./microservices/mysql-connect');
 const redisDB = require('./microservices/redis-connect');
-
-
 const serverCredentials = grpc.ServerCredentials.createSsl(rootCert, [{
   cert_chain: certChain,
   private_key: privateKey
 }], true);
-
 const numCPUs = os.cpus().length;
+const productService = require('./services/product.service');
+const productServiceDefinition = require('./protos/product_grpc_pb');
+
 
 function startServer() {
   const server = new grpc.Server();
+  server.addService(productServiceDefinition.ProductServiceService, {...productService});
 
   server.bindAsync(process.env.HOST + ':' + process.env.PORT, serverCredentials, (error, port) => {
     if (error) {

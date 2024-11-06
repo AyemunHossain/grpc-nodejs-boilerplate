@@ -16,7 +16,7 @@ function generateGrpcFiles(protoFile) {
   console.log(`Generating gRPC files for ${protoFile}...`);
   
   // Use protoc to run the command
-  const command = `protoc -I=${protoDir} ${protoFile} --js_out=import_style=commonjs,binary:${outputDir} --grpc_out=grpc_js:${outputDir} --plugin=protoc-gen-grpc=$(which grpc_tools_node_protoc_plugin)`;
+  const command = `protoc -I="${protoDir}" "${protoFile}" --js_out=import_style=commonjs,binary:"${outputDir}" --grpc_out=grpc_js:"${outputDir}" --plugin=protoc-gen-grpc=$(which grpc_tools_node_protoc_plugin)`;
   
   exec(command, (error, stdout, stderr) => {
     if (error) {
