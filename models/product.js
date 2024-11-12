@@ -20,7 +20,7 @@ const createProduct = async (data) => {
                             reject(err);
                         }
                         const cacheKey = `products:${result.insertId}`;
-                        redis.setEx(cacheKey, 3600, JSON.stringify(data)); // Cache for 1 hour
+                        redis.redisClient.setEx(cacheKey, 3600, JSON.stringify(data)); // Cache for 1 hour
                         resolve({ id: result.insertId, name, description, price, category });
                     }
                 );
@@ -68,9 +68,37 @@ const deleteProduct = async (id) => {
     }
 }
 
+const getProducts = async (page = 1, limit = 5, category = '', minPrice = 0, maxPrice = 100) => {
+    try {
+        return new Promise((resolve, reject) => {
+            mysql.getConnection('MASTER', (err, connection) => {
+                if (err) {
+                    console.error('Database connection failed: ' + err.stack);
+                    reject(err);
+                }
+                connection.query(
+                    'SELECT * FROM products WHERE category = ? AND price >= ? AND price <= ? LIMIT ? OFFSET ?',
+                    [category, minPrice, maxPrice, limit, (page - 1) * limit],
+                    (err, results) => {
+                        if (err) {
+                            console.error('Error occurred while fetching the products: ' + err.stack);
+                            reject(err);
+                        }
+                        resolve(results);
+                    }
+                );
+                connection.release();
+            });
+        });
+    } catch (err) {
+        console.error({ "getProducts": err });
+        return null;
+    }
+}
 
 module.exports = {
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProducts
 };

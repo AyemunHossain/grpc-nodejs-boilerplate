@@ -70,6 +70,28 @@ function deserialize_product_GetProductsResponse(buffer_arg) {
   return product_pb.GetProductsResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_product_PriceUpdateRequest(arg) {
+  if (!(arg instanceof product_pb.PriceUpdateRequest)) {
+    throw new Error('Expected argument of type product.PriceUpdateRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_product_PriceUpdateRequest(buffer_arg) {
+  return product_pb.PriceUpdateRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_product_PriceUpdateResponse(arg) {
+  if (!(arg instanceof product_pb.PriceUpdateResponse)) {
+    throw new Error('Expected argument of type product.PriceUpdateResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_product_PriceUpdateResponse(buffer_arg) {
+  return product_pb.PriceUpdateResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_product_UpdateProductRequest(arg) {
   if (!(arg instanceof product_pb.UpdateProductRequest)) {
     throw new Error('Expected argument of type product.UpdateProductRequest');
@@ -105,28 +127,6 @@ var ProductServiceService = exports.ProductServiceService = {
     responseSerialize: serialize_product_CreateProductResponse,
     responseDeserialize: deserialize_product_CreateProductResponse,
   },
-  getProducts: {
-    path: '/product.ProductService/GetProducts',
-    requestStream: false,
-    responseStream: false,
-    requestType: product_pb.GetProductsRequest,
-    responseType: product_pb.GetProductsResponse,
-    requestSerialize: serialize_product_GetProductsRequest,
-    requestDeserialize: deserialize_product_GetProductsRequest,
-    responseSerialize: serialize_product_GetProductsResponse,
-    responseDeserialize: deserialize_product_GetProductsResponse,
-  },
-  updateProduct: {
-    path: '/product.ProductService/UpdateProduct',
-    requestStream: false,
-    responseStream: false,
-    requestType: product_pb.UpdateProductRequest,
-    responseType: product_pb.UpdateProductResponse,
-    requestSerialize: serialize_product_UpdateProductRequest,
-    requestDeserialize: deserialize_product_UpdateProductRequest,
-    responseSerialize: serialize_product_UpdateProductResponse,
-    responseDeserialize: deserialize_product_UpdateProductResponse,
-  },
   deleteProduct: {
     path: '/product.ProductService/DeleteProduct',
     requestStream: false,
@@ -137,6 +137,39 @@ var ProductServiceService = exports.ProductServiceService = {
     requestDeserialize: deserialize_product_DeleteProductRequest,
     responseSerialize: serialize_product_DeleteProductResponse,
     responseDeserialize: deserialize_product_DeleteProductResponse,
+  },
+  getProducts: {
+    path: '/product.ProductService/GetProducts',
+    requestStream: false,
+    responseStream: true,
+    requestType: product_pb.GetProductsRequest,
+    responseType: product_pb.GetProductsResponse,
+    requestSerialize: serialize_product_GetProductsRequest,
+    requestDeserialize: deserialize_product_GetProductsRequest,
+    responseSerialize: serialize_product_GetProductsResponse,
+    responseDeserialize: deserialize_product_GetProductsResponse,
+  },
+  updateProduct: {
+    path: '/product.ProductService/UpdateProduct',
+    requestStream: true,
+    responseStream: false,
+    requestType: product_pb.UpdateProductRequest,
+    responseType: product_pb.UpdateProductResponse,
+    requestSerialize: serialize_product_UpdateProductRequest,
+    requestDeserialize: deserialize_product_UpdateProductRequest,
+    responseSerialize: serialize_product_UpdateProductResponse,
+    responseDeserialize: deserialize_product_UpdateProductResponse,
+  },
+  streamPriceUpdates: {
+    path: '/product.ProductService/StreamPriceUpdates',
+    requestStream: true,
+    responseStream: true,
+    requestType: product_pb.PriceUpdateRequest,
+    responseType: product_pb.PriceUpdateResponse,
+    requestSerialize: serialize_product_PriceUpdateRequest,
+    requestDeserialize: deserialize_product_PriceUpdateRequest,
+    responseSerialize: serialize_product_PriceUpdateResponse,
+    responseDeserialize: deserialize_product_PriceUpdateResponse,
   },
 };
 
