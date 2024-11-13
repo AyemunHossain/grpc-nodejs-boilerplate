@@ -44,7 +44,7 @@ message UpdateProductRequest {
 }
 
 message UpdateProductResponse {
-  Product product = 1;
+  repeated Product product = 1;
 }
 
 message PriceUpdateRequest {

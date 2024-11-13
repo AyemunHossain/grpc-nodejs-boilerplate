@@ -19,6 +19,13 @@ This project builds a scalable gRPC  in Node.js, enabling fast, secure, and effi
 5. **middleware**: Contains middleware functions for intercepting and modifying gRPC requests.
 6. **utils**: Contains utility functions for handling gRPC requests and responses.
 7. **index.js**: Contains server-side code for defining gRPC services and starting the server.
+8. **config**: Contains configuration settings for the server.
+9. **microservice**: Contains microservices for handling gRPC requests.
+10. **package.json**: Contains metadata and dependencies for the project.
+11. **scripts**: Contains scripts for generating gRPC service and client files.
+12. **utils**: Contains utility functions for handling gRPC requests and responses.
+13. **.env**: Contains environment variables for the project.
+14. **package.json**: Contains dependency tree for the project.
 
 # Prerequisites
 1. Node.js
@@ -28,7 +35,35 @@ This project builds a scalable gRPC  in Node.js, enabling fast, secure, and effi
 
 # Setup
 1. Clone the repository.
-2. Install the dependencies using the following command:
+2. Install protoc (Protocol Buffers Compiler) on a Linux system, follow these steps: 
+
+```bash
+sudo apt update
+sudo apt install -y unzip wget
+```
+Download the protoc Binary
+
+```bash
+wget https://github.com/protocolbuffers/protobuf/releases/download/v23.3/protoc-23.3-linux-x86_64.zip
+```
+Extract the Binary
+
+```bash
+unzip protoc-23.3-linux-x86_64.zip -d protoc
+```
+Move protoc to a Directory in Your PATH
+
+```bash
+sudo mv protoc/bin/protoc /usr/local/bin/
+sudo mv protoc/include/* /usr/local/include/
+```
+Verify Installation
+
+```bash
+protoc --version
+```
+
+3. Install the dependencies using the following command:
 ```bash
 npm install
 ```

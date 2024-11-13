@@ -1,4 +1,0 @@
-export GRPC_TRACE=all
-export GRPC_VERBOSITY=DEBUG
-
-to see errors 

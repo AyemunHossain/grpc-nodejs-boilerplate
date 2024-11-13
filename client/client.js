@@ -12,7 +12,7 @@ const ENDPOINT = 'localhost:6002';
 // Add metadata for authentication
 function getMetadata() {
   const metadata = new grpc.Metadata();
-  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE0MzY5NDcsImV4cCI6MTczMTUyMzM0N30.xP5fGKbePzo3Z6-yfPlLeSV-tG2hZ8ld7UD2wrdy_dw');
+  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE1MjYxODgsImV4cCI6MTczMTYxMjU4OH0.kLcvAVS_8nPnugqmccBES5Vwa5w41STGcMheDLyZcB0');
   return metadata;
 }
 
@@ -35,17 +35,17 @@ function createProduct() {
     const createProductRequest = new productProto.CreateProductRequest();
     createProductRequest.setProduct(product);
 
-    const call = client.createProduct(createProductRequest, getMetadata(), (err, response)=>{
-      if(err){
+    const call = client.createProduct(createProductRequest, getMetadata(), (err, response) => {
+      if (err) {
         console.error({ "createProduct": err });
       }
-      if(response){
+      if (response) {
         console.log('Server response:', response.getProduct().toObject());
       }
 
     });
 
-    
+
   } catch (err) {
     console.error({ "createProduct": err });
   }
@@ -53,7 +53,7 @@ function createProduct() {
 }
 
 // 2. Get Products with Pagination and Filtering
-function getProducts(){
+function getProducts() {
   try {
     const getProductsRequest = new productProto.GetProductsRequest();
     getProductsRequest.setPage(1);
@@ -76,8 +76,47 @@ function getProducts(){
   }
 }
 
-// Usage
-// createProduct();
-getProducts();
+// 3. Update a Product: Client streaming API
+function updateProducts() {
 
-// getProducts(1, 5, 'Electronics');
+  const call = client.updateProduct(getMetadata(),(error, response) => {
+    if (!error) {
+      const updatedProducts = response.getUpdatedProductsList();
+      console.log("Updated Products:", updatedProducts.map(p => p.getName()).join(', '));
+    } else {
+      console.error("Error:", error);
+    }
+  });
+
+
+  const products = [
+    { id: 1, name: "Product A", description: "Updated Description A", price: 49.99, category: "Category A" },
+    { id: 2, name: "Product B", description: "Updated Description B", price: 59.99, category: "Category B" },
+    { id: 3, name: "Product C", description: "Updated Description C", price: 69.99, category: "Category C" }
+  ];
+
+
+  products.forEach((productData) => {
+    const product = new productProto.Product();
+    product.setId(productData.id);
+    product.setName(productData.name);
+    product.setDescription(productData.description);
+    product.setPrice(productData.price);
+    product.setCategory(productData.category);
+
+    const updateRequest = new productProto.UpdateProductRequest();
+    updateRequest.setProduct(product);
+
+    call.write(updateRequest);
+  });
+
+  call.end();
+
+
+}
+
+
+// Usage
+createProduct();
+// getProducts();
+// updateProducts();

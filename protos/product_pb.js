@@ -162,7 +162,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.product.UpdateProductResponse = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.product.UpdateProductResponse.repeatedFields_, null);
 };
 goog.inherits(proto.product.UpdateProductResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -1361,6 +1361,13 @@ proto.product.UpdateProductRequest.prototype.hasProduct = function() {
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.product.UpdateProductResponse.repeatedFields_ = [1];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -1392,7 +1399,8 @@ proto.product.UpdateProductResponse.prototype.toObject = function(opt_includeIns
  */
 proto.product.UpdateProductResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    product: (f = msg.getProduct()) && proto.product.Product.toObject(includeInstance, f)
+    productList: jspb.Message.toObjectList(msg.getProductList(),
+    proto.product.Product.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -1432,7 +1440,7 @@ proto.product.UpdateProductResponse.deserializeBinaryFromReader = function(msg, 
     case 1:
       var value = new proto.product.Product;
       reader.readMessage(value,proto.product.Product.deserializeBinaryFromReader);
-      msg.setProduct(value);
+      msg.addProduct(value);
       break;
     default:
       reader.skipField();
@@ -1463,9 +1471,9 @@ proto.product.UpdateProductResponse.prototype.serializeBinary = function() {
  */
 proto.product.UpdateProductResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getProduct();
-  if (f != null) {
-    writer.writeMessage(
+  f = message.getProductList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
       1,
       f,
       proto.product.Product.serializeBinaryToWriter
@@ -1475,39 +1483,40 @@ proto.product.UpdateProductResponse.serializeBinaryToWriter = function(message, 
 
 
 /**
- * optional Product product = 1;
- * @return {?proto.product.Product}
+ * repeated Product product = 1;
+ * @return {!Array<!proto.product.Product>}
  */
-proto.product.UpdateProductResponse.prototype.getProduct = function() {
-  return /** @type{?proto.product.Product} */ (
-    jspb.Message.getWrapperField(this, proto.product.Product, 1));
+proto.product.UpdateProductResponse.prototype.getProductList = function() {
+  return /** @type{!Array<!proto.product.Product>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.product.Product, 1));
 };
 
 
 /**
- * @param {?proto.product.Product|undefined} value
+ * @param {!Array<!proto.product.Product>} value
  * @return {!proto.product.UpdateProductResponse} returns this
 */
-proto.product.UpdateProductResponse.prototype.setProduct = function(value) {
-  return jspb.Message.setWrapperField(this, 1, value);
+proto.product.UpdateProductResponse.prototype.setProductList = function(value) {
+  return jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
 
 
 /**
- * Clears the message field making it undefined.
+ * @param {!proto.product.Product=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.product.Product}
+ */
+proto.product.UpdateProductResponse.prototype.addProduct = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.product.Product, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
  * @return {!proto.product.UpdateProductResponse} returns this
  */
-proto.product.UpdateProductResponse.prototype.clearProduct = function() {
-  return this.setProduct(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.product.UpdateProductResponse.prototype.hasProduct = function() {
-  return jspb.Message.getField(this, 1) != null;
+proto.product.UpdateProductResponse.prototype.clearProductList = function() {
+  return this.setProductList([]);
 };
 
 

@@ -33,10 +33,16 @@ const deleteProductRequestSchema = Joi.object({
   id: Joi.number().integer().required()
 });
 
+const updatePriceRequestSchema = Joi.object({
+  id: Joi.number().integer().required(),
+  newPrice: Joi.number().required()
+});
+
 module.exports = {
   productSchema,
   createProductRequestSchema,
   getProductsRequestSchema,
   updateProductRequestSchema,
-  deleteProductRequestSchema
+  deleteProductRequestSchema,
+  updatePriceRequestSchema
 };
