@@ -63,8 +63,13 @@ function getProducts() {
     getProductsRequest.setMaxPrice(100);
 
     const call = client.getProducts(getProductsRequest, getMetadata());
+
     call.on('data', (response) => {
-      console.log('Server response:', response.getProducts().getName());
+      const name = response.getProducts().getName();
+      const description = response.getProducts().getDescription();
+      const price = response.getProducts().getPrice();
+      const category = response.getProducts().getCategory();
+      console.log('Server response:', { name, description, price, category });
     });
 
     call.on('end', () => {
@@ -117,6 +122,6 @@ function updateProducts() {
 
 
 // Usage
-createProduct();
+// createProduct();
 // getProducts();
-// updateProducts();
+updateProducts();

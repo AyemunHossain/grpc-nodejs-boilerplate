@@ -19,8 +19,8 @@ const getProductsRequestSchema = Joi.object({
   page: Joi.number().integer().optional(),
   limit: Joi.number().integer().optional(),
   category: Joi.string().optional(),
-  min_price: Joi.number().optional(),
-  max_price: Joi.number().optional()
+  minPrice: Joi.number().optional(),
+  maxPrice: Joi.number().optional()
 });
 
 // UpdateProductRequest schema
