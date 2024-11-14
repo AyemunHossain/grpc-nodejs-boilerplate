@@ -160,8 +160,8 @@ var ProductServiceService = exports.ProductServiceService = {
     responseSerialize: serialize_product_UpdateProductResponse,
     responseDeserialize: deserialize_product_UpdateProductResponse,
   },
-  streamPriceUpdates: {
-    path: '/product.ProductService/StreamPriceUpdates',
+  priceUpdates: {
+    path: '/product.ProductService/PriceUpdates',
     requestStream: true,
     responseStream: true,
     requestType: product_pb.PriceUpdateRequest,

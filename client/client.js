@@ -12,7 +12,7 @@ const ENDPOINT = 'localhost:6002';
 // Add metadata for authentication
 function getMetadata() {
   const metadata = new grpc.Metadata();
-  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE1MjYxODgsImV4cCI6MTczMTYxMjU4OH0.kLcvAVS_8nPnugqmccBES5Vwa5w41STGcMheDLyZcB0');
+  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE2MTUzNDUsImV4cCI6MTczMTcwMTc0NX0.xkbZAYunm3gr_lbWolEVTuwGA6kkoCQhiaWqZS7u38o');
   return metadata;
 }
 
@@ -128,8 +128,41 @@ function updateProducts() {
 
 }
 
+// 4. Price update: Bidirectional streaming API
+function updatePrice() {
+  const call = client.priceUpdates(getMetadata());
+
+  // Listen for responses from the server
+  call.on('data', (priceUpdateResponse) => {
+    console.log(`Price update confirmed for product ID: ${priceUpdateResponse.getId()} with new price: ${priceUpdateResponse.getUpdatedPrice()}`);
+  });
+
+  // Array of sample price updates
+  const priceUpdates = [
+    { id: '1', newPrice: 99.99 },
+    { id: '2', newPrice: 149.99 },
+    { id: '3', newPrice: 199.99 },
+    { id: '4', newPrice: 249.99 }
+  ];
+
+  // Send each price update
+  priceUpdates.forEach((update) => {
+    const priceUpdateRequest = new productProto.PriceUpdateRequest();
+    priceUpdateRequest.setId(update.id);
+    priceUpdateRequest.setNewprice(update.newPrice);
+
+    console.log(`Sending price update for product ID: ${update.id} with new price: ${update.newPrice}`);
+    call.write(priceUpdateRequest);
+  });
+
+  // End the client stream
+  call.end();
+
+}
+
 
 // Usage
 // createProduct();
 // getProducts();
-updateProducts();
+// updateProducts();
+updatePrice();

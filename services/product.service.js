@@ -185,14 +185,15 @@ const deleteProduct = async (call, callback) => {
 };
 
 //PriceUpdates service: Bidirectional Streaming API
-const priceUpdates = async (call) => {
+const priceUpdates = async (call, callback) => {
+
     call.on("data", async (request) => {
         // Validate the request
         validateRequest(productValidation.updatePriceRequestSchema, request);
 
         // Get the product details
         const productId = request.getId();
-        const newPrice = request.getNewPrice();
+        const newPrice = request.getNewprice();
 
         const result = await productModel.setPrice(productId, newPrice);
 

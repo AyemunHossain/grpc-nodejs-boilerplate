@@ -35,7 +35,7 @@ const deleteProductRequestSchema = Joi.object({
 
 const updatePriceRequestSchema = Joi.object({
   id: Joi.number().integer().required(),
-  newPrice: Joi.number().required()
+  newprice: Joi.number().required()
 });
 
 module.exports = {

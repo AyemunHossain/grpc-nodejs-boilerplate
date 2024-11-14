@@ -7,7 +7,7 @@ service ProductService {
   rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
   rpc GetProducts (GetProductsRequest) returns (stream GetProductsResponse);
   rpc UpdateProduct (stream UpdateProductRequest) returns (UpdateProductResponse);
-  rpc StreamPriceUpdates (stream PriceUpdateRequest) returns (stream PriceUpdateResponse);
+  rpc PriceUpdates (stream PriceUpdateRequest) returns (stream PriceUpdateResponse);
 
 }
 

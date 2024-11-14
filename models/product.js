@@ -113,28 +113,52 @@ const getProducts = async (page = 1, limit = 5, category = '', minPrice = 0, max
 
 const setPrice = async (id, price) => {
     try {
-        const [result] = await mysql.query(
-        'UPDATE products SET price = ? WHERE id = ?',
-        [price, id]
-        );
-    
-        const cacheKey = `products:${id}`;
-        redis.get(cacheKey, (err, data) => {
-            if (err) {
-                console.error('Error occurred while fetching the product from cache: ' + err.stack);
-            }
-            const product = JSON.parse(data);
-            product.price = price;
-            redis.setEx(cacheKey, 3600, JSON.stringify(product)); // Cache for 1 hour
+        return new Promise((resolve, reject) => {
+            mysql.getConnection('MASTER', async (err, connection) => {
+                if (err) {
+                    console.error('Database connection failed: ' + err.stack);
+                    reject(err);
+                    return;
+                }
+                try {
+                    const [result] = await connection.query(
+                        'UPDATE products SET price = ? WHERE id = ?',
+                        [price, id],
+                        (err, results) => {
+                            if (err) {
+                                console.error('Error occurred while fetching the products: ' + err.stack);
+                                reject(err);
+                            }
+                            resolve(results);
+                        }
+                    );
+
+                    const cacheKey = `products:${id}`;
+                    redis.get(cacheKey, (err, data) => {
+                        if (err) {
+                            console.error('Error occurred while fetching the product from cache: ' + err.stack);
+                        }
+                        if (data) {
+                            const product = JSON.parse(data);
+                            product.price = price;
+                            redis.setEx(cacheKey, 3600, JSON.stringify(product)); // Cache for 1 hour
+                        }
+                    });
+
+                    resolve({ id, price });
+                } catch (err) {
+                    console.error('Error occurred while updating the product price: ' + err.stack);
+                    reject(err);
+                } finally {
+                    connection.release();
+                }
+            });
         });
-    
-        return { id, price };
     } catch (err) {
         console.error({ "setPrice": err });
         return null;
     }
 }
-
 module.exports = {
     createProduct,
     updateProduct,
