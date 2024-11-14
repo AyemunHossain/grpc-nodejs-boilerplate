@@ -36,20 +36,35 @@ const createProduct = async (data) => {
 const updateProduct = async (data) => {
     try {
         const { id, name, description, price, category } = data;
-        const [result] = await mysql.query(
-        'UPDATE products SET name = ?, description = ?, price = ?, category = ? WHERE id = ?',
-        [name, description, price, category, id]
-        );
-    
-        const cacheKey = `products:${id}`;
-        redis.setEx(cacheKey, 3600, JSON.stringify(data)); // Cache for 1 hour
-    
-        return { id, name, description, price, category };
+        return new Promise((resolve, reject) => {
+            mysql.getConnection('MASTER', (err, connection) => {
+                if (err) {
+                    console.error('Database connection failed: ' + err.stack);
+                    reject(err);
+                    return;
+                }
+                connection.query(
+                    'UPDATE products SET name = ?, description = ?, price = ?, category = ? WHERE id = ?',
+                    [name, description, price, category, id],
+                    (err, result) => {
+                        if (err) {
+                            console.error('Error occurred while updating the product: ' + err.stack);
+                            reject(err);
+                            return;
+                        }
+                        const cacheKey = `products:${id}`;
+                        redis.redisClient.setEx(cacheKey, 3600, JSON.stringify(data)); // Cache for 1 hour
+                        resolve({ id, name, description, price, category });
+                    }
+                );
+                connection.release();
+            });
+        });
     } catch (err) {
         console.error({ "updateProduct": err });
         return null;
     }
-}
+};
 
 const deleteProduct = async (id) => {
     try {

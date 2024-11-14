@@ -95,12 +95,13 @@ const updateProduct = async (call, callback) => {
             // Validate the request
             validateRequest(productValidation.updateProductRequestSchema, request);
 
+            const product = request.getProduct();
             // Get the product details
-            const id = request.getId();
-            const name = request.getName();
-            const description = request.getDescription();
-            const price = request.getPrice();
-            const category = request.getCategory();
+            const id = product.getId();
+            const name = product.getName();
+            const description = product.getDescription();
+            const price = product.getPrice();
+            const category = product.getCategory();
 
             products.push({
                 id,
@@ -114,29 +115,33 @@ const updateProduct = async (call, callback) => {
         call.on("end", async () => {
 
             // Update the products
-            for (const item of products) {
-                await productModel.updateProduct(item);
-            }
+            try {
+                for (const item of products) {
+                    await productModel.updateProduct(item);
+                }
 
-            if (!result) {
-                return callback({
+
+                const response = new productProtoModel.UpdateProductResponse();
+
+                products.forEach((product) => {
+                    const productResponse = new productProtoModel.Product();
+                    productResponse.setId(product.id);
+                    productResponse.setName(product.name);
+                    productResponse.setDescription(product.description);
+                    productResponse.setPrice(product.price);
+                    productResponse.setCategory(product.category);
+                    response.addProduct(productResponse);
+                });
+                callback(null, response);
+            } catch (err) {
+                console.error({ updateProduct: err });
+                callback({
                     code: grpc.status.INTERNAL,
                     details: "Internal server error",
                 });
             }
-            
-            const response = new productProtoModel.UpdateProductResponse();
-            updatedProducts.forEach((product) => {
-                const productResponse = new productProtoModel.Product();
-                productResponse.setId(product.id);
-                productResponse.setName(product.name);
-                productResponse.setDescription(product.description);
-                productResponse.setPrice(product.price);
-                productResponse.setCategory(product.category);
-                response.addProducts(productResponse);
-              });
-          
-            callback(null, response);
+
+
         });
     } catch (err) {
         console.error({ updateProduct: err });

@@ -84,10 +84,18 @@ function getProducts() {
 // 3. Update a Product: Client streaming API
 function updateProducts() {
 
-  const call = client.updateProduct(getMetadata(),(error, response) => {
+  const call = client.updateProduct(getMetadata(), (error, response) => {
     if (!error) {
-      const updatedProducts = response.getUpdatedProductsList();
-      console.log("Updated Products:", updatedProducts.map(p => p.getName()).join(', '));
+      const updatedProducts = response.getProductList();
+      updatedProducts.forEach((product) => {
+        console.log("Updated Product:", {
+          id: product.getId(),
+          name: product.getName(),
+          description: product.getDescription(),
+          price: product.getPrice(),
+          category: product.getCategory(),
+        });
+      });
     } else {
       console.error("Error:", error);
     }
@@ -95,9 +103,9 @@ function updateProducts() {
 
 
   const products = [
-    { id: 1, name: "Product A", description: "Updated Description A", price: 49.99, category: "Category A" },
-    { id: 2, name: "Product B", description: "Updated Description B", price: 59.99, category: "Category B" },
-    { id: 3, name: "Product C", description: "Updated Description C", price: 69.99, category: "Category C" }
+    { id: 1, name: "Product A", description: "Updated Description A", price: 49.99, category: "Electronics" },
+    { id: 2, name: "Product B", description: "Updated Description B", price: 59.99, category: "Gadgets" },
+    { id: 3, name: "Product C", description: "Updated Description C", price: 69.99, category: "Grocery" }
   ];
 
 
