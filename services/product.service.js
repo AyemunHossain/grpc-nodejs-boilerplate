@@ -185,45 +185,52 @@ const deleteProduct = async (call, callback) => {
 };
 
 //PriceUpdates service: Bidirectional Streaming API
-const priceUpdates = async (call, callback) => {
-
+const priceUpdates = async (call) => {
     call.on("data", async (request) => {
-        // Validate the request
-        validateRequest(productValidation.updatePriceRequestSchema, request);
+        try {
+            // Validate the request
+            validateRequest(productValidation.updatePriceRequestSchema, request);
 
-        // Get the product details
-        const productId = request.getId();
-        const newPrice = request.getNewprice();
+            // Get the product details
+            const productId = request.getId();
+            const newPrice = request.getNewprice();
 
-        const result = await productModel.setPrice(productId, newPrice);
+            const result = await productModel.setPrice(productId, newPrice);
 
-        if (!result) {
-            return call.write({
+            if (!result) {
+                return call.write({
+                    code: grpc.status.INTERNAL,
+                    details: "Internal server error",
+                });
+            }
+
+            // Create a response
+            const response = new productProtoModel.PriceUpdateResponse();
+            response.setId(result.id);
+            response.setUpdatedprice(result.price);
+            call.write(response); // Send response to the client
+        } catch (err) {
+            console.error("Error during priceUpdates:", err);
+            call.write({
                 code: grpc.status.INTERNAL,
                 details: "Internal server error",
             });
         }
-
-        // Create a response
-        const response = new productProtoModel.PriceUpdateResponse();
-        response.setId(result.id);
-        response.setUpdatedPrice(result.price);
-
-        call.write(response);
     });
 
+    // Handle when the client signals the end of the stream
     call.on("end", () => {
-        call.end();
+        console.log("Client has finished streaming. Ending server stream.");
+        call.end(); // End the server's response stream
     });
 
+    // Handle errors during streaming
     call.on("error", (err) => {
-        console.error({ priceUpdates: err });
-        call.write({
-            code: grpc.status.INTERNAL,
-            details: "Internal server error",
-        });
+        console.error("Stream error:", err);
+        call.end(); // End the stream on error
     });
 };
+
 
 // Export the service
 module.exports = {

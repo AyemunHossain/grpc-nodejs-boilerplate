@@ -133,16 +133,27 @@ function updatePrice() {
   const call = client.priceUpdates(getMetadata());
 
   // Listen for responses from the server
-  call.on('data', (priceUpdateResponse) => {
-    console.log(`Price update confirmed for product ID: ${priceUpdateResponse.getId()} with new price: ${priceUpdateResponse.getUpdatedPrice()}`);
+  call.on("data", (priceUpdateResponse) => {
+    console.log("Received response from server:");
+    console.log(`Price update confirmed for product ID: ${priceUpdateResponse.getId()} with new price: ${priceUpdateResponse.getUpdatedprice()}`);
+  });
+
+  // Handle errors
+  call.on("error", (error) => {
+    console.error("Error received:", error);
+  });
+
+  // Handle the end of the stream
+  call.on("end", () => {
+    console.log("Server has ended the response stream.");
   });
 
   // Array of sample price updates
   const priceUpdates = [
-    { id: '1', newPrice: 99.99 },
-    { id: '2', newPrice: 149.99 },
-    { id: '3', newPrice: 199.99 },
-    { id: '4', newPrice: 249.99 }
+    { id: "1", newPrice: 99.99 },
+    { id: "2", newPrice: 149.99 },
+    { id: "3", newPrice: 199.99 },
+    { id: "4", newPrice: 249.99 },
   ];
 
   // Send each price update
@@ -152,13 +163,15 @@ function updatePrice() {
     priceUpdateRequest.setNewprice(update.newPrice);
 
     console.log(`Sending price update for product ID: ${update.id} with new price: ${update.newPrice}`);
-    call.write(priceUpdateRequest);
+    call.write(priceUpdateRequest); // Write each request to the stream
   });
 
-  // End the client stream
-  call.end();
-
+  // Signal the end of the client stream once all data is sent
+  setTimeout(()=>{
+    call.end();
+  },5000);
 }
+
 
 
 // Usage
