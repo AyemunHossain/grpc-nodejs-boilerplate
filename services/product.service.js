@@ -234,9 +234,20 @@ const priceUpdates = async (call) => {
 
 // Export the service
 module.exports = {
-    createProduct: authInterceptor(createProduct),
-    getProducts: authInterceptor(getProducts),
-    updateProduct: authInterceptor(updateProduct),
-    deleteProduct: authInterceptor(deleteProduct),
-    priceUpdates: authInterceptor(priceUpdates),
+    authenticated: {
+        createProduct: authInterceptor(createProduct),
+        getProducts: authInterceptor(getProducts),
+        updateProduct: authInterceptor(updateProduct),
+        deleteProduct: authInterceptor(deleteProduct),
+        priceUpdates: authInterceptor(priceUpdates),
+    },
+    unauthenticated: {
+        createProduct,
+        getProducts,
+        updateProduct,
+        deleteProduct,
+        priceUpdates,
+    },
 };
+
+

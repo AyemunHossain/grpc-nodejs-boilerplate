@@ -19,7 +19,7 @@ const productServiceDefinition = require('./protos/product_grpc_pb');
 
 function startServer() {
   const server = new grpc.Server();
-  server.addService(productServiceDefinition.ProductServiceService, {...productService});
+  server.addService(productServiceDefinition.ProductServiceService, {...productService.authenticated});
 
   server.bindAsync(process.env.HOST + ':' + process.env.PORT, serverCredentials, (error, port) => {
     if (error) {

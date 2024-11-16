@@ -12,7 +12,7 @@ const ENDPOINT = 'localhost:6002';
 // Add metadata for authentication
 function getMetadata() {
   const metadata = new grpc.Metadata();
-  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE2MTUzNDUsImV4cCI6MTczMTcwMTc0NX0.xkbZAYunm3gr_lbWolEVTuwGA6kkoCQhiaWqZS7u38o');
+  metadata.add('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3MzE3ODAxMDQsImV4cCI6MTczMTg2NjUwNH0.6Bv5XekP9c6mo5xuFmlmYj5JUj3wNEazJk2oXU2WQyE');
   return metadata;
 }
 
