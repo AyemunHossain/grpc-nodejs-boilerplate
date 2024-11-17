@@ -13,16 +13,22 @@ const createProduct = async (call, callback) => {
         validateRequest(productValidation.createProductRequestSchema, call.request);
 
         // Get the product details
-        const data = call.request.getProduct().toObject();
-        const result = await productModel.createProduct(data);
+        const data = call.request.getProduct();
+        const product_req = new productProtoModel.Product();
+        product_req.setName(data.getName());
+        product_req.setDescription(data.getDescription());
+        product_req.setPrice(data.getPrice());
+        product_req.setCategory(data.getCategory());
+        const result = await productModel.createProduct(product_req);
+        
 
         if (!result) {
+            console.error("Error while creating product");
             return callback({
                 code: grpc.status.INTERNAL,
                 details: "Internal server error",
             });
         }
-
         // Create a response
         const response = new productProtoModel.CreateProductResponse();
         const product = new productProtoModel.Product();
@@ -32,7 +38,7 @@ const createProduct = async (call, callback) => {
         product.setPrice(result.price);
         product.setCategory(result.category);
         response.setProduct(product);
-
+        
         callback(null, response);
     } catch (err) {
         console.error({ createProduct: err });
