@@ -5,7 +5,7 @@ const productModel = require("../models/product");
 const productValidation = require("../utils/product.validation");
 const validateRequest = require("../middlewares/req-validation");
 const authInterceptor = require("../middlewares/authentication");
-
+ 
 // Create product service : Unary API
 const createProduct = async (call, callback) => {
     try {
