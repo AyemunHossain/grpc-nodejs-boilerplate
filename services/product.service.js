@@ -126,9 +126,7 @@ const updateProduct = async (call, callback) => {
                     await productModel.updateProduct(item);
                 }
 
-
                 const response = new productProtoModel.UpdateProductResponse();
-
                 products.forEach((product) => {
                     const productResponse = new productProtoModel.Product();
                     productResponse.setId(product.id);

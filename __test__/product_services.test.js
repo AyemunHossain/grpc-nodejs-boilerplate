@@ -23,6 +23,7 @@ describe("Product Service", () => {
     call = {
       request: {
         getProduct: jest.fn().mockImplementation(() => ({
+          getId: jest.fn().mockResolvedValue(1),
           getName: jest.fn().mockReturnValue("Product A"),
           getDescription: jest.fn().mockReturnValue("Description A"),
           getPrice: jest.fn().mockReturnValue(100),
@@ -33,6 +34,8 @@ describe("Product Service", () => {
         getCategory: jest.fn().mockReturnValue("Category A"),
         getMaxPrice: jest.fn().mockReturnValue(1000),
         getMinPrice: jest.fn().mockReturnValue(100),
+        getId: jest.fn().mockReturnValue(1),
+        getNewprice: jest.fn().mockReturnValue(200),
       },
       metadata: {
         get: jest.fn(() => [
@@ -129,69 +132,6 @@ describe("Product Service", () => {
     interceptedCreateProduct(call, callback);
   });
 
-  it("should update a product price and return the response", () => {
-    // Mock authInterceptor to call the original method
-    authInterceptor.mockImplementation((method) => {
-      return (call, callback) => {
-        call.user = { id: "user-id", role: "admin", name: "Ayemun Hossain" }; // Simulate a valid user
-        method(call, callback); // Call the actual method
-      };
-    });
-
-    validateRequest.mockImplementation(() => true);
-    jest
-      .spyOn(productModel, "updateProduct")
-      .mockResolvedValue({
-        id: 1,
-        name: "Product A",
-        description: "Description A",
-        price: 100,
-        category: "Category A",
-      });
-    // Wrap the createProduct method with the mocked interceptor
-    const interceptedPriceUpdates = authInterceptor(
-      unauthenticated.priceUpdates
-    );
-    // Spy on the callback function
-    const callback = jest.fn((err, response) => {
-      try {
-        expect(call.user).toEqual({
-          id: "user-id",
-          role: "admin",
-          name: "Ayemun Hossain",
-        });
-        expect(callback).toHaveBeenCalled(); // Ensure callback is called in the original method
-
-        const mock_response = new productProtoModel.UpdatePriceResponse();
-        const product = new productProtoModel.Product();
-        product.setId(1);
-        product.setName("Product A");
-        product.setDescription("Description A");
-        product.setPrice(100);
-        product.setCategory("Category A");
-        mock_response.setProduct(product);
-        // console.log({mock_response});
-
-        expect(callback).toHaveBeenCalledWith(
-          null,
-          expect.objectContaining({
-            getProduct: expect.any(Function),
-            setProduct: expect.any(Function),
-            clearProduct: expect.any(Function),
-            hasProduct: expect.any(Function),
-            serializeBinary: expect.any(Function),
-            toObject: expect.any(Function),
-          })
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    });
-
-    // Call the intercepted method
-    interceptedPriceUpdates(call, callback);
-  });
-
   it("should update a product price and return the response", async() => {
     // Mock authInterceptor to call the original method
     authInterceptor.mockImplementation((method) => {
@@ -200,7 +140,7 @@ describe("Product Service", () => {
         method(call, callback); // Call the actual method
       };
     });
-
+    jest.spyOn(call, 'write');
     validateRequest.mockImplementation(() => true);
     jest
       .spyOn(productModel, "setPrice")
@@ -212,9 +152,16 @@ describe("Product Service", () => {
     const interceptedPriceUpdates = authInterceptor(
       unauthenticated.priceUpdates
     );
+
     // Spy on the callback function
     const callback = jest.fn();
 
+    call.on.mockImplementation((event, callback) => {
+      if (event === 'data') {
+        callback(call.request);
+      }
+    });
+    
     // Call the intercepted method
     await interceptedPriceUpdates(call, callback);
 
@@ -228,69 +175,118 @@ describe("Product Service", () => {
     mock_response.setId(1);
     mock_response.setUpdatedprice(200);
     expect(call.write).toHaveBeenCalled();
-    // expect(callback).toHaveBeenCalledWith(
-    //   null,
-    //   expect.objectContaining({
-    //     getProduct: expect.any(Function),
-    //     setProduct: expect.any(Function),
-    //     clearProduct: expect.any(Function),
-    //     hasProduct: expect.any(Function),
-    //     serializeBinary: expect.any(Function),
-    //     toObject: expect.any(Function),
-    //   })
-    // );
-
+    
+    expect(call.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        getId: expect.any(Function),
+        getUpdatedprice: expect.any(Function),
+        serializeBinary: expect.any(Function),
+        setId: expect.any(Function),
+        setUpdatedprice: expect.any(Function),
+        toObject: expect.any(Function),
+      })
+    );
   });
 
-  // it("should get products", async() => {
-  //   // Mock authInterceptor to call the original method
-  //   authInterceptor.mockImplementation((method) => {
-  //     return (call, callback) => {
-  //       call.user = { id: "user-id", role: "admin", name: "Ayemun Hossain" }; // Simulate a valid user
-  //       method(call, callback); // Call the actual method
-  //     };
-  //   });
+  it("should update a product return response",async()=>{
+    authInterceptor.mockImplementation((method) => {
+      return (call, callback) => {
+        call.user = { id: "user-id", role: "admin", name: "Ayemun Hossain" }; // Simulate a valid user
+        method(call, callback); // Call the actual method
+      };
+    });
+    jest.spyOn(call, 'write');
+    validateRequest.mockImplementation(() => true);
+    jest
+      .spyOn(productModel, "updateProduct")
+      .mockResolvedValue(true);
+    // Wrap the createProduct method with the mocked interceptor
+    const interceptedProductUpdates = authInterceptor(
+      unauthenticated.updateProduct
+    );
 
-  //   validateRequest.mockImplementation(() => true);
+    // Spy on the callback function
+    const callback = jest.fn();
 
-  //   jest
-  //     .spyOn(productModel, "getProducts")
-  //     .mockResolvedValue([
-  //       { id: "1", name: "Product A", description: "Description A", price: 200, category: "Category A" }
-  //     ]);
+    call.on.mockImplementation((event, callback) => {
+      if (event === 'data') {
+        callback(call.request);
+      }
+    });
 
-  //   jest.spyOn(call, 'write');
+    call.on.mockImplementation((event, callback) => {
+      if (event === 'end') {
+        callback(call.request);
+      }
+    });
 
-  //   const interceptedGetProducts = authInterceptor(unauthenticated.getProducts);
-  //   // Spy on the callback function
-  //   const callback = jest.fn();
-  //   // Call the intercepted method
-  //   await interceptedGetProducts(call, callback);
+    // Call the intercepted method
+    await interceptedProductUpdates(call, callback);
+    expect(callback).toHaveBeenCalled();
 
-  //   expect(call.user).toEqual({
-  //     id: "user-id",
-  //     role: "admin",
-  //     name: "Ayemun Hossain",
-  //   });
+    // todo more depth equality check
+    expect(callback).toHaveBeenCalledWith(null,
+      expect.objectContaining({
+        addProduct: expect.any(Function),
+        clearProductList: expect.any(Function),
+        getProductList: expect.any(Function),
+        serializeBinary: expect.any(Function),
+        setProductList: expect.any(Function),
+        toObject: expect.any(Function),
+      })
+    );
+
+  })
+
+  it("should get products", async() => {
+    // Mock authInterceptor to call the original method
+    authInterceptor.mockImplementation((method) => {
+      return (call, callback) => {
+        call.user = { id: "user-id", role: "admin", name: "Ayemun Hossain" }; // Simulate a valid user
+        method(call, callback); // Call the actual method
+      };
+    });
+
+    const mockProducts = [
+      { id: '1', name: 'Phone', description: 'Smartphone', price: 500, category: 'electronics' },
+      { id: '2', name: 'Laptop', description: 'Gaming Laptop', price: 1500, category: 'electronics' },
+    ];
+
+    validateRequest.mockImplementation(() => true);
+
+    jest
+      .spyOn(productModel, "getProducts")
+      .mockResolvedValue(mockProducts);
+
+    jest.spyOn(call, 'write');
+
+    const interceptedGetProducts = authInterceptor(unauthenticated.getProducts);
+    // Spy on the callback function
+    const callback = jest.fn();
+    // Call the intercepted method
+    await interceptedGetProducts(call, callback);
+
+    expect(call.user).toEqual({
+      id: "user-id",
+      role: "admin",
+      name: "Ayemun Hossain",
+    });
+
+    expect(call.write).toHaveBeenCalled();
+    expect(call.write).toHaveBeenCalledTimes(mockProducts.length);
+
+    mockProducts.forEach((product, index) => {
+      const writtenResponse = call.write.mock.calls[index][0];
+      const productResponse = new productProtoModel.Product();
+      productResponse.setId(product.id);
+      productResponse.setName(product.name);
+      productResponse.setDescription(product.description);
+      productResponse.setPrice(product.price);
+      productResponse.setCategory(product.category);
+      expect(writtenResponse).toBeInstanceOf(productProtoModel.GetProductsResponse);
+      expect(writtenResponse.toObject()).toEqual(productResponse.toObject());
+    });
     
-    
-  //   const mock_response = new productProtoModel.GetProductsResponse();
-  //   const product = new productProtoModel.Product();
-  //   product.setId(1);
-  //   product.setName("Product A");
-  //   product.setDescription("Description A");
-  //   product.setPrice(100);
-  //   product.setCategory("Category A");
-  //   mock_response.setProducts(product);
-  //   // console.log({mock_response});
-
-  //   expect(call.write).toHaveBeenCalled(); // Ensure callback is called in the original method
-  //   expect(call.write).toHaveBeenCalledWith({
-  //           getProducts: expect.any(Function)
-  //         })
-
-  //   expect(call.end).toHaveBeenCalledWith()
-
-    
-  // });
+    expect(call.end).toHaveBeenCalled()
+  });
 });
